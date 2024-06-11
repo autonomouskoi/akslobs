@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AKSLOBS</title>
+</head>
+<body>
+    <h1>AKSLOBS by SelfDrivingCarp</h1>
+    <p>This is experimental software.</p>
+    <p>In OBS, add a <em>Browser</em> Source with
+<ul>
+    <li>URL <em>http://localhost:8011/obs</em></li>
+    <li>Width <em>210</em></li>
+    <li>Height <em>210</em></li>
+</ul>
+</p>
+<p>Closing this browser tab/window will cause the program to exit.</p>
+<div>
+    <table>
+        <tr>
+            <td>Deck1</td>
+            <td><input type="checkbox" id="deck1" checked="true"></input></td>
+        </tr>
+        <tr>
+            <td>Deck2</td>
+            <td><input type="checkbox" id="deck2" checked="true"></input></td>
+        </tr>
+        <tr>
+            <td>Deck3</td>
+            <td><input type="checkbox" id="deck3" checked="true"></input></td>
+        </tr>
+        <tr>
+            <td>Deck4</td>
+            <td><input type="checkbox" id="deck4" checked="true"></input></td>
+        </tr>
+    </table>
+</div>
+</body>
+<script type="text/javascript">
+
+let exit = false;
+let keepalive = () => {
+    if (exit) {
+        return;
+    }
+    fetch("/ka").finally();
+    setTimeout(keepalive, 1000);
+};
+keepalive();
+
+let deckCheck = (event) => {
+    let params = new URLSearchParams();
+    params.set("deck", event.target.id);
+    params.set("hide", (!event.target.checked).toString());
+    fetch("/hide_deck?"+params.toString(), {
+        method: "PUT",
+    }).catch(err => console.log("error (un)hiding deck: ", err))
+};
+
+["deck1", "deck2", "deck3", "deck4"].forEach(deckID => {
+    let deckElem = document.getElementById(deckID);
+    deckElem.onchange = deckCheck;
+});
+
+</script>
+</html>

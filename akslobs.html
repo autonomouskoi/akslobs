@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+        <style>
+body {
+    height: 100%;
+    margin: 0;
+}
+#decksContainer {
+    height: 208px;
+}
+.deck {
+    background-color: aqua;
+    border: solid black 1px;
+    width: 208px;
+    font-family: "Titillium Web", sans-serif;
+}
+        </style>
+    </head>
+    <body></body>
+    <script>
+let body = document.getElementsByTagName("body")[0];
+let decksContainer = document.createElement("div");
+decksContainer.id = "decksContainer";
+body.appendChild(decksContainer);
+
+let artists = [];
+let titles = [];
+let decks = [];
+
+let deckIDs = ["deck1", "deck2", "deck3", "deck4"];
+
+deckIDs.forEach((deckID, i) => {
+    let deck = document.createElement("div");
+    deck.className = "deck";
+    deck.id = deckID;
+    decks.push(deck);
+
+    let deckArtist = document.createElement("div");
+    deckArtist.className = "artist";
+    deckArtist.innerText = "No Artist";
+    artists.push(deckArtist);
+    deck.appendChild(deckArtist);
+
+    let deckTitle = document.createElement("div");
+    deckTitle.className = "title";
+    deckTitle.innerText = "No Title";
+    titles.push(deckTitle);
+    deck.appendChild(deckTitle);
+
+    decksContainer.appendChild(deck);
+})
+
+let setDecks = (decksData) => {
+    deckIDs.forEach((deckID, i) => {
+        if (!decksData[deckID]) {
+            return
+        }
+        let thisDeck = decksData[deckID];
+        artists[i].innerText = thisDeck.artist;
+        titles[i].innerText = thisDeck.title;
+        decks[i].style.display = decksData.hide[i] ? "none" : "block";
+    })
+}
+
+const update = async () => {
+    let resp = await fetch("/decks");
+    decksData = await resp.json();
+    setDecks(decksData);
+    window.setTimeout(update, 1000);
+}
+update();
+    </script>
+</html>
