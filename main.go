@@ -9,10 +9,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"time"
 
-	"github.com/jasonmf/cmdutils/fatalif"
 	"github.com/pkg/browser"
 	"golang.org/x/sync/errgroup"
 )
@@ -84,17 +82,11 @@ func main() {
 		})
 	}
 
-	homeDir, err := os.UserHomeDir()
-	fatalif.Error(err, "determining home directory")
-	overlayPath := filepath.Join(homeDir, "akslobs.html")
-
 	eg.Go(func() error {
 		defer log.Print("exiting webserver")
 		mux := http.NewServeMux()
 
-		mux.HandleFunc("/obs", func(w http.ResponseWriter, r *http.Request) {
-			http.ServeFile(w, r, overlayPath)
-		})
+		mux.Handle("/obs", NewOverlayHandler(flag.Args()))
 		mux.HandleFunc("/decks", d.getDecks)
 		NewUI(d, cancel, mux)
 		listen := "localhost:8011"
